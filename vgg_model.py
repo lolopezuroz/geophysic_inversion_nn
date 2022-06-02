@@ -58,7 +58,7 @@ class Vgg_Model(Model):
         if "ice_thickness" in selected_outputs:
             
             ice_thickness_filters = [32,32,64,64]
-            ice_thickness_strides = [[1,1],[2,2],[1,1],[1,1]]
+            ice_thickness_strides = [[1,1],[2,2],[1,1],[2,2]]
             
             ice_thickness_units = [128,1]
             ice_thickness_activation = ["relu","relu"]
@@ -69,7 +69,7 @@ class Vgg_Model(Model):
         ice_occupation_processes = None
         if "ice_occupation" in selected_outputs:
             ice_occupation_filters = [32,32,64,64]
-            ice_occupation_strides = [[1,1],[2,2],[1,1],[1,1]]
+            ice_occupation_strides = [[1,1],[2,2],[1,1],[2,2]]
             
             ice_occupation_units = [128,1]
             ice_occupation_activation = ["relu","sigmoid"]

@@ -181,14 +181,23 @@ def load_dataset(args) -> tf.data.Dataset:
         return tuple(yield_input + yield_output)
 
     dataset = tf.data.Dataset.from_tensor_slices(slice_dataset)
-    dataset = dataset.map(decode)
-    dataset = dataset.prefetch(1)
-    dataset = dataset.batch(batchsize)
-
+    
     dataset_length = len(dataset)
-
-    # split dataset
+    
     train_dataset = dataset.take(int(dataset_length*split_fraction))
     test_dataset = dataset.skip(int(dataset_length*split_fraction))
+    
+    train_dataset = train_dataset.map(decode)
+    test_dataset = test_dataset.map(decode)
+    
+    train_dataset = train_dataset.shuffle(len(dataset))
+    
+    train_dataset = train_dataset.batch(batchsize)
+    test_dataset = test_dataset.batch(batchsize)
+    
+    train_dataset = train_dataset.prefetch(1)
+    test_dataset = test_dataset.prefetch(1)
+
+    # split dataset
 
     return train_dataset, test_dataset
