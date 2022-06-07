@@ -1,3 +1,4 @@
+from subprocess import call
 from keras import layers, Model, Sequential
 from tensorflow import Tensor
 
@@ -54,68 +55,109 @@ class Resnet_model(Model):
             y = Resnet_model.mp(y) if self.upsample else y
             return y
 
+    class Resnet_empty(Model):
+        def call(self, input, training=None, mask=None) -> Tensor:
+            return input
+
     ### static methods
     
     add = layers.Add()
     rl = layers.ReLU()
     mp = layers.MaxPool2D()
+    cat = layers.Concatenate()
     
     def resnet_denses(units,activations) -> Sequential:
         denses = [layers.Dense(units, activation=activation, use_bias=False) for units, activation in zip(units,activations)]
         return Sequential([layers.Flatten()]+denses)
 
-    def __init__(self, selected_inputs, selected_outputs, *args, **kwargs) -> None:
-        super(Resnet_model, self).__init__(*args, **kwargs)
+    def input_process(filters,do_pooling):
+        blocks = [Resnet_model.Resnet_block(filters, up) for filters, up in zip(filters,do_pooling)]
+        return Sequential(blocks)
 
-        ice_velocity_processes = None
-        if "ice_velocity" in selected_inputs:
-            ice_velocity_filters = [[16,16],[16,16]]
-            blocks = [Resnet_model.Resnet_block(filters, up) for filters, up in zip(ice_velocity_filters,[True,False])]
-            ice_velocity_processes = Sequential(blocks)
-        
-        slope_processes = None
-        if "slope" in selected_inputs:
-            slope_filters = [[16,16],[16,16]]
-            blocks = [Resnet_model.Resnet_block(filters, up) for filters, up in zip(slope_filters,[True,True])]
-            slope_processes = Sequential(blocks)
-        
-        ice_thickness_processes = None
-        if "ice_thickness" in selected_outputs:
-            ice_thickness_filters = [[32,32],[32,32]]
-            blocks = [Resnet_model.Resnet_block(filters, up) for filters, up in zip(ice_thickness_filters,[True,False])]
-            
-            ice_thickness_units = [128,1]
-            ice_thickness_activations = ["relu","relu"]
-            denses = [Resnet_model.resnet_denses(ice_thickness_units, ice_thickness_activations)]
-            
-            ice_thickness_processes = Sequential(blocks+denses)
-            
-        ice_occupation_processes = None
-        if "ice_occupation" in selected_outputs:
-            ice_occupation_filters = [[32,32],[32,32]]
-            blocks = [Resnet_model.Resnet_block(filters,up) for filters, up in zip(ice_occupation_filters,[True,False])]
-            
-            ice_occupation_units = [128,1]
-            ice_occupation_activations = ["relu","sigmoid"]
-            denses = [Resnet_model.resnet_denses(ice_occupation_units, ice_occupation_activations)]
-            
-            ice_occupation_processes = Sequential(blocks+denses)
+    def output_process(filters,do_pooling,units,activations):
+        blocks = [Resnet_model.Resnet_block(filters, up) for filters, up in zip(filters,do_pooling)]
+        denses = [Resnet_model.resnet_denses(units, activations)]
+        return Sequential(blocks+denses)
+
+    ### input parameters
+
+
+    def input_ice_velocity():
+        filters = [[16,16],[16,16]]
+        do_pooling = [True,False]
+        processes = Resnet_model.input_process(filters,
+                                               do_pooling)
+        return processes
+
+    def input_slope():
+        filters = [[16,16],[16,16]]
+        do_pooling = [True,True]
+        processes = Resnet_model.input_process(filters,
+                                               do_pooling)
+        return processes
+
+    ### main parameters
+
+    def early_process():
+        filters = [[16,16],[16,16]]
+        do_pooling = [True,False]
+        return Resnet_model.input_process(filters,do_pooling)
+    
+    def main_process():
+        filters = [[32,32]]
+        do_pooling = [False]
+        return Resnet_model.input_process(filters,do_pooling)
+
+    ### output parameters
+
+    def output_ice_thickness():
+        filters = [[32,32],[32,32]]
+        do_pooling = [True,False]
+        units = [128,1]
+        activations = ["relu","relu"]
+        processes = Resnet_model.output_process(filters,
+                                                do_pooling,
+                                                units,
+                                                activations)
+        return processes
+
+    def output_ice_occupation():
+        filters = [[32,32],[32,32]]
+        do_pooling = [True,False]
+        units = [128,1]
+        activations = ["relu","sigmoid"]
+        processes = Resnet_model.output_process(filters,
+                                                do_pooling,
+                                                units,
+                                                activations)
+        return processes
+
+    def __init__(self, early_fusion, selected_inputs, selected_outputs, *args, **kwargs) -> None:
+        super(Resnet_model, self).__init__(*args, **kwargs)
         
         self.input_processes = []
-        self.input_processes.append(ice_velocity_processes) if ice_velocity_processes else None
-        self.input_processes.append(slope_processes) if slope_processes else None
-        
-        main_filters = [[32,32]]
-        main_blocks = [Resnet_model.Resnet_block(filters) for filters in main_filters]
-        self.main_processes = Sequential(main_blocks)
-
+        self.main_processes = []
         self.output_processes = []
-        self.output_processes.append(ice_occupation_processes) if ice_occupation_processes else None
-        self.output_processes.append(ice_thickness_processes) if ice_thickness_processes else None
+        
+        if early_fusion:
+            # note : using early fusion requires concatenating the data (to same resolution and padding)
+            self.input_processes = [Resnet_model.Resnet_empty() for _ in selected_inputs]
+            self.fusion = Resnet_model.cat
+            self.main_processes += [Resnet_model.early_process()]
+        else:
+            self.input_processes.append(self.input_ice_velocity()) if "ice_velocity" in selected_inputs else None
+            self.input_processes.append(self.input_slope()) if "slope" in selected_inputs else None
+            self.fusion = Resnet_model.add
+        
+        self.main_processes += [Resnet_model.main_process()]
+        self.main_processes = Sequential(self.main_processes)
+
+        self.output_processes.append(self.output_ice_occupation()) if "ice_occupation" in selected_outputs else None
+        self.output_processes.append(self.output_ice_thickness()) if "ice_thickness" in selected_outputs else None
         
     def call(self,inputs,training=None, **kwargs) -> list:
         processed_inputs = [input_process(input) for input, input_process in zip(inputs, self.input_processes)]
-        x = Resnet_model.add(processed_inputs) if len(processed_inputs) != 1 else processed_inputs[0]
+        x = self.fusion(processed_inputs) if len(processed_inputs) != 1 else processed_inputs[0]
         x = self.main_processes(x)
         outputs = [output_process(x) for output_process in self.output_processes]
         return outputs

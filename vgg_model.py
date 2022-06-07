@@ -33,7 +33,7 @@ class Vgg_Model(Model):
                         for filters, strides in zip(filters,strides)]
         return Sequential(convolutions)
     
-    def __init__(self, selected_inputs, selected_outputs, *args, **kwargs):
+    def __init__(self, early_fusion, selected_inputs, selected_outputs, *args, **kwargs):
         super(Vgg_Model, self).__init__(*args, **kwargs)
 
         self.cat = layers.Concatenate()

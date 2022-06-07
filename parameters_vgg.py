@@ -36,6 +36,8 @@ losses = {}
 metrics = {}
 loss_weights = {}
 
+args["early_fusion"] = False
+
 if "ice_velocity" in inputs:
     inputs_dir["ice_velocity"] = ice_velocity_dir
 

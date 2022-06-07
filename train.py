@@ -51,7 +51,7 @@ def train(args,train_dataset,test_dataset):
     checkpoint_dir=args["checkpoint_dir"]
     loss_weights=args["loss_weights"]
 
-    model = args["model"](args["inputs"],args["outputs"])
+    model = args["model"](args["early_fusion"],args["inputs"],args["outputs"])
 
     optimizer = optimizer(learning_rate=learning_rate)
 

@@ -3,14 +3,14 @@ import tensorflow as tf
 from resnet_model import Resnet_model
 
 # construct paths to data
-data_dir = "/home/lorenzo/geophysic_inversion/process/create_dataset/output_data"
+data_dir = "/home/lopezurl/geophysic_inversion/create_dataset/output_data"
 ice_velocity_dir = os.path.join(data_dir,'V_RGI-11_2021July01_tiles')
 ice_occupation_dir = os.path.join(data_dir,'glacier_class')
 ice_thickness_dir = os.path.join(data_dir,'IceThickness_tiles')
 ice_thickness_uncertainty_minus_dir = os.path.join(data_dir,'IceThicknessUncertaintyMinus_tiles')
 ice_thickness_uncertainty_plus_dir = os.path.join(data_dir,'IceThicknessUncertaintyPlus_tiles')
 slope_dir = os.path.join(data_dir,'slope_swissAlti3d')
-chechpoint_dir='/home/lorenzo/geophysic_inversion/process/nn/checkpoint/resnet'
+chechpoint_dir='/home/lopezurl/geophysic_inversion/nn/checkpoint/resnet'
 
 args = {}
 
@@ -36,6 +36,8 @@ losses = {}
 metrics = {}
 loss_weights = {}
 
+args["early_fusion"] = False
+
 if "ice_velocity" in inputs:
     inputs_dir["ice_velocity"] = ice_velocity_dir
 
@@ -46,7 +48,7 @@ if "ice_occupation" in outputs:
     groundtruths_dir["ice_occupation"] = ice_occupation_dir
     losses["ice_occupation"] = tf.keras.losses.BinaryCrossentropy()
     loss_weights["ice_occupation"] = 1/3
-    metrics["ice_occupation"] = [tf.keras.metrics.BinaryAccuracy(), tf.keras.metrics.BinaryIoU()]
+    metrics["ice_occupation"] = [tf.keras.metrics.BinaryAccuracy()]
 
 if "ice_thickness" in outputs:
     groundtruths_dir["ice_thickness"] = ice_thickness_dir
