@@ -53,12 +53,14 @@ def train(args,train_dataset,test_dataset):
 
     model = args["model"](args["early_fusion"],args["inputs"],args["outputs"])
 
+    n_input = len(args["inputs"])
+
     optimizer = optimizer(learning_rate=learning_rate)
 
     for epoch in range(epochs):
         print("\nStart of epoch %d" % (epoch,))
         for step, sample in enumerate(train_dataset):
-            inputs, ground_truths = sample[0:1], sample[1:]
+            inputs, ground_truths = sample[0:n_input], sample[n_input:]
 
             loss_values = train_step(inputs, ground_truths)
             if step % 20 == 0: print("\tTraining loss (for one batch) at step "+str(step)+" :",float(loss_values[0]), float(loss_values[1]))
@@ -66,7 +68,7 @@ def train(args,train_dataset,test_dataset):
         print("Training | "+print_metrics())
         
         for sample in test_dataset:
-            inputs, ground_truths = sample[0:1], sample[1:]
+            inputs, ground_truths = sample[0:n_input], sample[n_input:]
             loss_values = test_step(inputs, ground_truths)
 
         print("Validation | "+print_metrics())

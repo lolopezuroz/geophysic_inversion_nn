@@ -145,15 +145,15 @@ class Resnet_model(Model):
             self.fusion = Resnet_model.cat
             self.main_processes += [Resnet_model.early_process()]
         else:
-            self.input_processes.append(self.input_ice_velocity()) if "ice_velocity" in selected_inputs else None
-            self.input_processes.append(self.input_slope()) if "slope" in selected_inputs else None
+            self.input_processes.append(Resnet_model.input_ice_velocity()) if "ice_velocity" in selected_inputs else None
+            self.input_processes.append(Resnet_model.input_slope()) if "slope" in selected_inputs else None
             self.fusion = Resnet_model.add
         
         self.main_processes += [Resnet_model.main_process()]
-        self.main_processes = Sequential(self.main_processes)
+        self.main_processes = Sequential(Resnet_model.main_process())
 
-        self.output_processes.append(self.output_ice_occupation()) if "ice_occupation" in selected_outputs else None
-        self.output_processes.append(self.output_ice_thickness()) if "ice_thickness" in selected_outputs else None
+        self.output_processes.append(Resnet_model.output_ice_occupation()) if "ice_occupation" in selected_outputs else None
+        self.output_processes.append(Resnet_model.output_ice_thickness()) if "ice_thickness" in selected_outputs else None
         
     def call(self,inputs,training=None, **kwargs) -> list:
         processed_inputs = [input_process(input) for input, input_process in zip(inputs, self.input_processes)]

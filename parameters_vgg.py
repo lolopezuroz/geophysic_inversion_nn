@@ -24,7 +24,7 @@ args["learning_rate"]=1e-3
 args["optimizer"]=tf.keras.optimizers.Adam
 args["checkpoint_dir"]=chechpoint_dir # where to save the model
 
-inputs = ["ice_velocity"]
+inputs = ["ice_velocity","slope"]
 outputs = ["ice_occupation","ice_thickness"]
 
 args["inputs"] = inputs
@@ -36,7 +36,7 @@ losses = {}
 metrics = {}
 loss_weights = {}
 
-args["early_fusion"] = False
+args["early_fusion"] = True
 
 if "ice_velocity" in inputs:
     inputs_dir["ice_velocity"] = ice_velocity_dir

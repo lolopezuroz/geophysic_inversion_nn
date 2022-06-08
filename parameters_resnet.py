@@ -24,7 +24,7 @@ args["learning_rate"]=1e-3
 args["optimizer"]=tf.keras.optimizers.Adam
 args["checkpoint_dir"]=chechpoint_dir # where to save the model
 
-inputs = ["ice_velocity"]
+inputs = ["ice_velocity","slope"]
 outputs = ["ice_occupation","ice_thickness"]
 
 args["inputs"] = inputs
@@ -54,7 +54,9 @@ if "ice_thickness" in outputs:
     groundtruths_dir["ice_thickness"] = ice_thickness_dir
     losses["ice_thickness"] = tf.keras.losses.MeanSquaredError()
     loss_weights["ice_thickness"] = 2/3
-    metrics["ice_thickness"] = [tf.keras.metrics.MeanSquaredError()]
+    metrics["ice_thickness"] = [tf.keras.metrics.MeanSquaredError(name="mse")]
+
+args["criterion"] = "mse"
 
 args["inputs_dir"] = inputs_dir
 args["groundtruths_dir"] = groundtruths_dir
