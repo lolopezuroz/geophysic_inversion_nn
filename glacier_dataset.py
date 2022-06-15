@@ -180,7 +180,7 @@ def load_dataset(args) -> tf.data.Dataset:
 
         return tuple(yield_input + yield_output)
 
-    dataset = tf.data.Dataset.from_tensor_slices(slice_dataset)
+    with tf.device('/CPU:0'): dataset = tf.data.Dataset.from_tensor_slices(slice_dataset)
     
     dataset_length = len(dataset)
     

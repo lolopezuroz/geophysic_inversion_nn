@@ -47,13 +47,13 @@ if "slope" in inputs:
 if "ice_occupation" in outputs:
     groundtruths_dir["ice_occupation"] = ice_occupation_dir
     losses["ice_occupation"] = tf.keras.losses.BinaryCrossentropy()
-    loss_weights["ice_occupation"] = 1/3
+    loss_weights["ice_occupation"] = 1/5
     metrics["ice_occupation"] = [tf.keras.metrics.BinaryAccuracy()]
 
 if "ice_thickness" in outputs:
     groundtruths_dir["ice_thickness"] = ice_thickness_dir
     losses["ice_thickness"] = tf.keras.losses.MeanSquaredError()
-    loss_weights["ice_thickness"] = 2/3
+    loss_weights["ice_thickness"] = 4/5
     metrics["ice_thickness"] = [tf.keras.metrics.MeanSquaredError(name="mse")]
 
 args["criterion"] = "mse"

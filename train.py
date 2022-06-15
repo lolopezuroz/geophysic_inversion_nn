@@ -68,6 +68,7 @@ def train(args,train_dataset,test_dataset):
         print("Training | "+print_metrics())
         
         for sample in test_dataset:
+
             inputs, ground_truths = sample[0:n_input], sample[n_input:]
             loss_values = test_step(inputs, ground_truths)
 
