@@ -2,6 +2,9 @@ import os
 import datetime
 import tensorflow
 import numpy
+import rasterio
+import copy
+import math
 
 from PIL import Image
 from osgeo import gdal, ogr

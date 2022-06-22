@@ -9,7 +9,7 @@ ice_thickness_dir = os.path.join(data_dir,'IceThickness_tiles')
 ice_thickness_uncertainty_minus_dir = os.path.join(data_dir,'IceThicknessUncertaintyMinus_tiles')
 ice_thickness_uncertainty_plus_dir = os.path.join(data_dir,'IceThicknessUncertaintyPlus_tiles')
 slope_dir = os.path.join(data_dir,'')
-chechpoint_dir='/home/lorenzo/geophysic_inversion/process/nn/checkpoint/vgg'
+chechpoint_dir='./checkpoint/vgg'
 
 args = {}
 

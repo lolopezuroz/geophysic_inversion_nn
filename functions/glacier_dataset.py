@@ -1,4 +1,7 @@
-from functions.importation import os, numpy as np, tensorflow as tf, Image, DataFrame as Df
+from functions.importation import numpy as np,\
+                                  tensorflow as tf,\
+                                  Image
+from functions.usual_functions import extract_center, extract_paths
 
 """
 functions to prepare a dataset for a model to be trained on it by
@@ -11,56 +14,6 @@ represent a geographic area
 # is this alright ?
 seed = 36
 rng = tf.random.Generator.from_seed(seed, alg='philox')
-
-def extract_center(array:np.ndarray) -> np.ndarray:
-    """
-    extract the 2x2xK matrix at the center of an array
-
-    array must have row x columns x channels size, rows and columns
-    size must be equals and even
-
-    array:ndarray
-
-    return:ndarray
-    """
-    x,y = array.shape[:2] # row x columns x channels
-    assert y == x and x%2 == 0 # equal size for rows and columns + even size
-
-    start = x//2-1 # row and column position from where to start the extract
-    end = start + 2 # end of the extract
-    extract = array[start:end,start:end]
-    return extract
-
-def extract_number(file:str) -> str:
-    """
-    extract tile id from file's name
-
-    file:str
-
-    return:str
-    """
-    return file.split('_')[-1].split('.')[0]
-
-def extract_paths(items_dictionnary:dict) -> Df:
-    """
-    check tiles where inputs and groundtruths are available
-
-    items_dictionnary:dict contain item name as key and directory as entry
-
-    return:panda.Dataframe
-    """
-    data_dict={}
-    for item_name, item_directory in items_dictionnary.items():
-        data_dict[item_name] = {}
-        for file in os.listdir(item_directory):
-            if file.split('.')[-1] != "tif": continue
-            number=extract_number(file)
-            data_dict[item_name][number]=os.path.join(item_directory,file)
-    
-    df = Df.from_dict(data_dict).fillna(False)
-    paths = df[df.all(axis=1)]
-
-    return paths
 
 def extract_slices(inputs:dict,groundtruths:dict,do_segmentation:bool=False):
     """
