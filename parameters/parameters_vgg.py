@@ -3,18 +3,18 @@ from models.vgg_model import Vgg_Model
 
 # construct paths to data
 data_dir = "/home/lorenzo/geophysic_inversion/process/create_dataset/output_data"
-ice_velocity_dir = os.path.join(data_dir,'V_RGI-11_2021July01_tiles')
-ice_occupation_dir = os.path.join(data_dir,'glacier_class')
-ice_thickness_dir = os.path.join(data_dir,'IceThickness_tiles')
-ice_thickness_uncertainty_minus_dir = os.path.join(data_dir,'IceThicknessUncertaintyMinus_tiles')
-ice_thickness_uncertainty_plus_dir = os.path.join(data_dir,'IceThicknessUncertaintyPlus_tiles')
-slope_dir = os.path.join(data_dir,'')
+ice_velocity_dir = os.path.join(data_dir, 'V_RGI-11_2021July01_tiles')
+ice_occupation_dir = os.path.join(data_dir, 'glacier_class')
+ice_thickness_dir = os.path.join(data_dir, 'IceThickness_tiles')
+ice_thickness_uncertainty_minus_dir = os.path.join(data_dir, 'IceThicknessUncertaintyMinus_tiles')
+ice_thickness_uncertainty_plus_dir = os.path.join(data_dir, 'IceThicknessUncertaintyPlus_tiles')
+slope_dir = os.path.join(data_dir, '')
 chechpoint_dir='./checkpoint/vgg'
 
 args = {}
 
 # model parameters
-args["model"] = Vgg_Model
+args["model"]=Vgg_Model
 args["batchsize"]=20
 args["epochs"]=100
 args["do_segmentation"]=False # if False central value should be extract from the groundtruth
@@ -23,8 +23,8 @@ args["learning_rate"]=1e-3
 args["optimizer"]=keras.optimizers.Adam
 args["checkpoint_dir"]=chechpoint_dir # where to save the model
 
-inputs = ["ice_velocity","slope"]
-outputs = ["ice_occupation","ice_thickness"]
+inputs = ["ice_velocity", "slope"]
+outputs = ["ice_occupation", "ice_thickness"]
 
 args["inputs"] = inputs
 args["outputs"] = outputs

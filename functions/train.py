@@ -3,7 +3,7 @@ from functions.usual_functions import unique_id
 
 tf.random.set_seed(0)
 
-def train(args,train_dataset,test_dataset):
+def train(args, train_dataset, test_dataset):
 
     def print_metrics() -> str:
         """
@@ -52,27 +52,27 @@ def train(args,train_dataset,test_dataset):
     checkpoint_dir=args["checkpoint_dir"]
     loss_weights=args["loss_weights"]
 
-    model = args["model"](args["early_fusion"],args["inputs"],args["outputs"])
+    model = args["model"](args["early_fusion"], args["inputs"], args["outputs"])
 
     n_input = len(args["inputs"])
 
     optimizer = optimizer(learning_rate=learning_rate)
 
-    checkpoint_dir = os.path.join(checkpoint_dir,unique_id())
-    checkpoint_dir_best = os.path.join(checkpoint_dir,"best")
+    checkpoint_dir = os.path.join(checkpoint_dir, unique_id())
+    checkpoint_dir_best = os.path.join(checkpoint_dir, "best")
     
     min_error = math.inf # initialize minimal error at infinity
 
     for epoch in range(epochs):
 
-        checkpoint_dir_i_epoch = os.path.join(checkpoint_dir,f"epoch_{epoch}")
+        checkpoint_dir_i_epoch = os.path.join(checkpoint_dir, f"epoch_{epoch}")
 
-        print("\nStart of epoch %d" % (epoch,))
+        print(f"\nStart of epoch {epoch}")
         for step, sample in enumerate(train_dataset):
             inputs, ground_truths = sample[0:n_input], sample[n_input:]
 
             loss_values = train_step(inputs, ground_truths)
-            if step % 20 == 0: print(f"\tTraining loss (for one batch) at step {step} :",float(loss_values[0]), float(loss_values[1]))
+            if step % 20 == 0: print(f"\tTraining loss (for one batch) at step {step} :", float(loss_values[0]), float(loss_values[1]))
         
         print(f"Training | {print_metrics()}")
         

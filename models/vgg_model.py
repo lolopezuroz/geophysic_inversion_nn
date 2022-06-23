@@ -44,7 +44,7 @@ class Vgg_Model(Model):
             ice_velocity_filters = [16,16]
             ice_velocity_strides = [[1,1],[2,2]]
 
-            ice_velocity_processes = Vgg_Model.vgg_convolutions(ice_velocity_filters,ice_velocity_strides)
+            ice_velocity_processes = Vgg_Model.vgg_convolutions(ice_velocity_filters, ice_velocity_strides)
         
         slope_processes = None
         if "slope" in selected_inputs:
@@ -52,16 +52,16 @@ class Vgg_Model(Model):
             slope_filters = [16,16]
             slope_strides = [[1,1],[2,2]]
 
-            slope_processes = Vgg_Model.vgg_convolutions(slope_filters,slope_strides)
+            slope_processes = Vgg_Model.vgg_convolutions(slope_filters, slope_strides)
         
         ice_thickness_processes = None
         if "ice_thickness" in selected_outputs:
             
-            ice_thickness_filters = [32,32,64,64]
-            ice_thickness_strides = [[1,1],[2,2],[1,1],[2,2]]
+            ice_thickness_filters = [32, 32, 64, 64]
+            ice_thickness_strides = [[1, 1], [2, 2], [1, 1],[2, 2]]
             
-            ice_thickness_units = [128,1]
-            ice_thickness_activation = ["relu","relu"]
+            ice_thickness_units = [128, 1]
+            ice_thickness_activation = ["relu", "relu"]
             
             ice_thickness_processes = Sequential([Vgg_Model.vgg_convolutions(ice_thickness_filters, ice_thickness_strides),
                                                   Vgg_Model.vgg_denses(ice_thickness_units, ice_thickness_activation)])
@@ -91,7 +91,7 @@ class Vgg_Model(Model):
         if ice_thickness_processes:
             self.output_processes.append(ice_thickness_processes)
         
-    def call(self,inputs,training=None, **kwargs):
+    def call(self, inputs, training=None, **kwargs):
 
         # process each input
         processed_inputs = [input_process(input) for input, input_process in zip(inputs, self.input_processes)]

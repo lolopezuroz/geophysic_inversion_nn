@@ -25,7 +25,7 @@ class Resnet_model(Model):
         def identity_block(filters:list) -> Sequential:
             convolutions = [layers.Conv2D(filters=i_filters,
                                         kernel_size=3,
-                                        strides=(1,1),
+                                        strides=(1, 1),
                                         activation="relu" if i+1<len(filters) else None,
                                         kernel_regularizer='l2')
                             for i, i_filters in enumerate(filters)]
@@ -34,13 +34,13 @@ class Resnet_model(Model):
         def shortcut(filters) -> layers.Conv2D:
             convolution = layers.Conv2D(filters=filters,
                                         kernel_size=1,
-                                        strides=(1,1),
+                                        strides=(1, 1),
                                         activation=None,
                                         kernel_regularizer='l2')
             return convolution
 
         def __init__(self, filters, upsample=False, *args, **kwargs) -> None:
-            super(Resnet_model.Resnet_block,self).__init__(*args, **kwargs)
+            super(Resnet_model.Resnet_block, self).__init__(*args, **kwargs)
             n = len(filters) # number of convolutions
             self.upsample = upsample
             self.identity_block_ = Resnet_model.Resnet_block.identity_block(filters)
@@ -66,16 +66,16 @@ class Resnet_model(Model):
     mp = layers.MaxPool2D()
     cat = layers.Concatenate()
     
-    def resnet_denses(units,activations) -> Sequential:
-        denses = [layers.Dense(units, activation=activation, use_bias=False) for units, activation in zip(units,activations)]
+    def resnet_denses(units, activations) -> Sequential:
+        denses = [layers.Dense(units, activation=activation, use_bias=False) for units, activation in zip(units, activations)]
         return Sequential([layers.Flatten()]+denses)
 
     def input_process(filters,do_pooling):
-        blocks = [Resnet_model.Resnet_block(filters, up) for filters, up in zip(filters,do_pooling)]
+        blocks = [Resnet_model.Resnet_block(filters, up) for filters, up in zip(filters, do_pooling)]
         return Sequential(blocks)
 
     def output_process(filters,do_pooling,units,activations):
-        blocks = [Resnet_model.Resnet_block(filters, up) for filters, up in zip(filters,do_pooling)]
+        blocks = [Resnet_model.Resnet_block(filters, up) for filters, up in zip(filters, do_pooling)]
         denses = [Resnet_model.resnet_denses(units, activations)]
         return Sequential(blocks+denses)
 
@@ -83,15 +83,15 @@ class Resnet_model(Model):
 
 
     def input_ice_velocity():
-        filters = [[16,16],[16,16]]
-        do_pooling = [True,False]
+        filters = [[16, 16], [16, 16]]
+        do_pooling = [True, False]
         processes = Resnet_model.input_process(filters,
                                                do_pooling)
         return processes
 
     def input_slope():
-        filters = [[16,16],[16,16]]
-        do_pooling = [True,True]
+        filters = [[16, 16], [16, 16]]
+        do_pooling = [True, True]
         processes = Resnet_model.input_process(filters,
                                                do_pooling)
         return processes
@@ -99,22 +99,22 @@ class Resnet_model(Model):
     ### main parameters
 
     def early_process():
-        filters = [[16,16],[16,16]]
-        do_pooling = [True,False]
-        return Resnet_model.input_process(filters,do_pooling)
+        filters = [[16, 16], [16, 16]]
+        do_pooling = [True, False]
+        return Resnet_model.input_process(filters, do_pooling)
     
     def main_process():
-        filters = [[32,32]]
+        filters = [[32, 32]]
         do_pooling = [False]
-        return Resnet_model.input_process(filters,do_pooling)
+        return Resnet_model.input_process(filters, do_pooling)
 
     ### output parameters
 
     def output_ice_thickness():
-        filters = [[32,32],[32,32]]
-        do_pooling = [True,False]
-        units = [128,1]
-        activations = ["relu","relu"]
+        filters = [[32, 32], [32, 32]]
+        do_pooling = [True, False]
+        units = [128, 1]
+        activations = ["relu", "relu"]
         processes = Resnet_model.output_process(filters,
                                                 do_pooling,
                                                 units,
@@ -122,10 +122,10 @@ class Resnet_model(Model):
         return processes
 
     def output_ice_occupation():
-        filters = [[32,32],[32,32]]
-        do_pooling = [True,False]
-        units = [128,1]
-        activations = ["relu","sigmoid"]
+        filters = [[32, 32], [32, 32]]
+        do_pooling = [True, False]
+        units = [128, 1]
+        activations = ["relu", "sigmoid"]
         processes = Resnet_model.output_process(filters,
                                                 do_pooling,
                                                 units,
@@ -155,7 +155,7 @@ class Resnet_model(Model):
         self.output_processes.append(Resnet_model.output_ice_occupation()) if "ice_occupation" in selected_outputs else None
         self.output_processes.append(Resnet_model.output_ice_thickness()) if "ice_thickness" in selected_outputs else None
         
-    def call(self,inputs,training=None, **kwargs) -> list:
+    def call(self, inputs, training=None, **kwargs) -> list:
         processed_inputs = [input_process(input) for input, input_process in zip(inputs, self.input_processes)]
         x = self.fusion(processed_inputs) if len(processed_inputs) != 1 else processed_inputs[0]
         x = self.main_processes(x)

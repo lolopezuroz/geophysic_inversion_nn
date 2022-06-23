@@ -9,16 +9,16 @@ chechpoint_dir="./checkpoints/resnet"
 
 # model parameters
 args["model"] = Resnet_model
-args["batchsize"]=20
-args["epochs"]=100
-args["do_segmentation"]=False # if False central value should be extract from the groundtruth
-args["split_fraction"]=3/5 # proportion used in training
-args["learning_rate"]=1e-3
-args["optimizer"]=keras.optimizers.Adam
-args["checkpoint_dir"]=chechpoint_dir # where to save the model
+args["batchsize"] = 20
+args["epochs"] = 100
+args["do_segmentation"] = False # if False central value should be extract from the groundtruth
+args["split_fraction"] = 3/5 # proportion used in training
+args["learning_rate"] = 1e-3
+args["optimizer"] = keras.optimizers.Adam
+args["checkpoint_dir"] = chechpoint_dir # where to save the model
 
-inputs = ["ice_velocity","slope"]
-outputs = ["ice_occupation","ice_thickness"]
+inputs = ["ice_velocity", "slope"]
+outputs = ["ice_occupation", "ice_thickness"]
 
 args["inputs"] = inputs
 args["outputs"] = outputs

@@ -1,5 +1,3 @@
-from enum import unique
-from numpy import save
 from functions.importation import os
 
 from functions.predict import predict
@@ -18,7 +16,10 @@ source_images = {
     "ice_thickness": "/home/lopezurl/geophysic_inversion/create_dataset/input_data/IceThickness_aligned.tif"
 }
 
-def deploy_model(args:dict,shapefile_path:str,save_location:str,best_model=True) -> str:
+def deploy_model(args:dict,
+                 shapefile_path:str,
+                 save_location:str,
+                 best_model=True) -> str:
     """
     save input, groundtruth and model prediction on defined regions
 
@@ -39,7 +40,7 @@ def deploy_model(args:dict,shapefile_path:str,save_location:str,best_model=True)
     
     # unique id to avoid overwriting old deployments (time referenced)
     deployment_id = unique_id()
-    save_location = os.path.join(save_location,deployment_id)
+    save_location = os.path.join(save_location, deployment_id)
 
     # data names
     inputs = args["inputs"]
@@ -60,12 +61,12 @@ def deploy_model(args:dict,shapefile_path:str,save_location:str,best_model=True)
 
         # extract region of interset from tif for figures and prediction
         inputs_arrays = []
-        for name, image_path in zip(name,inputs_paths):
-            save_path = os.path.join(save_images,f'{name}_zone_{i+1}.tif')
-            inputs_arrays.append(extract_zone(image_path,bounds,save_path)) # save the inputs arrays for prediction
-        for name, image_path in zip(outputs,ground_truths_paths):
-            save_path = os.path.join(save_images,f'{name}_zone_{i+1}.tif')
-            extract_zone(image_path,bounds,save_path)
+        for name, image_path in zip(name, inputs_paths):
+            save_path = os.path.join(save_images, f'{name}_zone_{i+1}.tif')
+            inputs_arrays.append(extract_zone(image_path, bounds, save_path)) # save the inputs arrays for prediction
+        for name, image_path in zip(outputs, ground_truths_paths):
+            save_path = os.path.join(save_images, f'{name}_zone_{i+1}.tif')
+            extract_zone(image_path, bounds, save_path)
 
         for model_path in models_paths: # for each model declination
 
@@ -75,19 +76,20 @@ def deploy_model(args:dict,shapefile_path:str,save_location:str,best_model=True)
             if (model_name[:4] == "best") == best_model: pass
             else: continue
 
-            save_images_i_zone = os.path.join(save_images,model_name)
+            save_images_i_zone = os.path.join(save_images, model_name)
             exist_directory(save_images_i_zone) # create directory if don't exist
 
             # import model
             early_fusion = args["early_fusion"]
-            model = args["model"](early_fusion,inputs,outputs) # model object initialized
+            model = args["model"](early_fusion, inputs, outputs) # model object initialized
             model.load_weights(model_path).expect_partial() # load parameters (.expect_partial() because not meant to be trained)
 
             predictions_arrays = predict(inputs_arrays,model)
 
             # save prediction
-            for array, name in zip(predictions_arrays,outputs):
-                save_path = os.path.join(save_images_i_zone,f'{name}_zone_{i+1}_{model_name}.tif')
-                replace_zone(inputs_paths[0],array,save_path) # georeference prediction using a duplicate of input raster
+            for array, name in zip(predictions_arrays, outputs):
+                save_path = os.path.join(save_images_i_zone,
+                                         f'{name}_zone_{i+1}_model_{model_name}.tif')
+                replace_zone(inputs_paths[0], array, save_path) # georeference prediction using a duplicate of input raster
     
     return save_location

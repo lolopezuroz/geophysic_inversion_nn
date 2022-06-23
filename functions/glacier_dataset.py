@@ -15,7 +15,7 @@ represent a geographic area
 seed = 36
 rng = tf.random.Generator.from_seed(seed, alg='philox')
 
-def extract_slices(inputs:dict,groundtruths:dict,do_segmentation:bool=False):
+def extract_slices(inputs:dict, groundtruths:dict, do_segmentation:bool=False):
     """
     a very convoluted function that create slices absolutely required for
     tf.data.Dataset.from_tensor_slices()
@@ -47,7 +47,7 @@ def extract_slices(inputs:dict,groundtruths:dict,do_segmentation:bool=False):
                     array = np.array(Image.open(file)) # extract array from tif
                     center = extract_center(array)
                     center = list(center.flatten().astype(int)) # turn matrix in list
-                    max_value = max(set(center),key=center.count) # what is most representated value (random if equal but rarely the case)
+                    max_value = max(set(center), key=center.count) # what is most representated value (random if equal but rarely the case)
                     if max_value   ==0: # no glacier for certain
                         label = 0
                         certainty = 1
@@ -76,7 +76,7 @@ def extract_slices(inputs:dict,groundtruths:dict,do_segmentation:bool=False):
             for file in paths[item_name]:
                 array = np.nan_to_num(np.array(Image.open(file)))
                 if len(np.shape(array)) < 3:
-                    array = np.expand_dims(array,axis=-1) # add channel dimension if empty
+                    array = np.expand_dims(array, axis=-1) # add channel dimension if empty
                 product_elements.append(array)
             slice_dataset[item_name] = product_elements
 
@@ -102,7 +102,7 @@ def load_dataset(args) -> tf.data.Dataset:
     batchsize = args["batchsize"]
     split_fraction = args["split_fraction"]
 
-    slice_dataset = extract_slices(inputs_dir,groundtruths_dir,do_segmentation)
+    slice_dataset = extract_slices(inputs_dir, groundtruths_dir, do_segmentation)
     
     def decode(sample) -> tuple:
         """
@@ -122,8 +122,8 @@ def load_dataset(args) -> tf.data.Dataset:
         for item_name, item in sample.items():
             if item_name in inputs or do_segmentation:
                 # data augmentation for arrays (flipped and rotated)
-                item_rot=tf.image.rot90(item,tf.random.uniform([],0,4,tf.int32))
-                item_flipped=tf.image.stateless_random_flip_left_right(item_rot,seed)
+                item_rot=tf.image.rot90(item, tf.random.uniform([], 0, 4, tf.int32))
+                item_flipped=tf.image.stateless_random_flip_left_right(item_rot, seed)
                 yield_input.append(item_flipped)
             elif item_name in outputs: yield_output.append(item)
 

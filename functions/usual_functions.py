@@ -22,7 +22,7 @@ def extract_paths(items_dictionnary:dict) -> DataFrame:
         for file in os.listdir(item_directory):
             if file.split('.')[-1] != "tif": continue
             number=extract_number(file)
-            data_dict[item_name][number]=os.path.join(item_directory,file)
+            data_dict[item_name][number]=os.path.join(item_directory, file)
     
     df = DataFrame.from_dict(data_dict).fillna(False)
     paths = df[df.all(axis=1)]
@@ -52,12 +52,12 @@ def extract_center(array:np.ndarray) -> np.ndarray:
 
     return:ndarray
     """
-    x,y = array.shape[:2] # row x columns x channels
+    x, y = array.shape[:2] # row x columns x channels
     assert y == x and x%2 == 0 # equal size for rows and columns + even size
 
     start = x//2-1 # row and column position from where to start the extract
     end = start + 2 # end of the extract
-    extract = array[start:end,start:end]
+    extract = array[start:end, start:end]
     return extract
 
 
@@ -65,7 +65,7 @@ def unique_id():
     return datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
 
-def collect_input(array,x,y,factor,padding,half_size):
+def collect_input(array, x, y, factor, padding, half_size):
 
     x_start = x*factor-padding
     x_end = x*factor+padding+half_size*2
@@ -73,8 +73,8 @@ def collect_input(array,x,y,factor,padding,half_size):
     y_start = y*factor-padding
     y_end = y*factor+padding+half_size*2
 
-    extract = array[x_start:x_end,y_start:y_end] 
-    extract = np.expand_dims(extract,-1) if len(np.shape(extract)) == 2 else extract
+    extract = array[x_start:x_end, y_start:y_end] 
+    extract = np.expand_dims(extract, -1) if len(np.shape(extract)) == 2 else extract
 
     return extract
 
@@ -95,11 +95,11 @@ def exist_directory(path:str) -> str:
     return path
 
 
-def extract_zone(image_filepath,bounds,save_location):
+def extract_zone(image_filepath, bounds, save_location):
     
-    gdal_warp_options = gdal.WarpOptions(outputBounds=bounds,dstNodata=0)
+    gdal_warp_options = gdal.WarpOptions(outputBounds=bounds, dstNodata=0)
     raster = gdal.Open(image_filepath)
-    raster = gdal.Warp(save_location,raster,options=gdal_warp_options)
+    raster = gdal.Warp(save_location, raster, options=gdal_warp_options)
 
     array = np.copy(raster.ReadAsArray())
 
@@ -108,7 +108,7 @@ def extract_zone(image_filepath,bounds,save_location):
     return array
 
 
-def replace_zone(image_filepath,array,save_location):
+def replace_zone(image_filepath, array, save_location):
 
     copy_raster = gdal.Open(image_filepath)
     new_raster = copy_raster.GetDriver().CreateCopy(save_location, copy_raster)
@@ -131,24 +131,32 @@ def extract_bounds(shapefile_path):
         extents.append(extent)
 
 
-def plot(parameters):
+def plot(array, parameters, save_location):
 
-    array = parameters.array
     cmap = parameters.cmap
     vmin, vmax = parameters.vmin, parameters.vmax
     title = parameters.title
     name = parameters.name
     extension = parameters.extension
-    save_location = parameters.save_location+name+extension
+    save_location = os.path.join(save_location,f"{name}.{extension}")
 
-    fig = plt.figure(figsize=(4,3))
+    fig = plt.figure(figsize=(4, 3))
     ax = fig.add_subplot(111)
 
     im = ax.imshow(array, vmin=vmin, vmax=vmax, cmap=cmap)
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
-    plt.colorbar(im,cax=cax)
+    plt.colorbar(im, cax=cax)
     ax.title.set_text(title)
     ax.set_axis_off()
 
     plt.savefig(save_location)
+
+
+def get_all_files(directory):
+    files = []
+    for object in os.listdir(directory):
+        object = os.path.join(directory, object)
+        if os.path.isdir(object): files += get_all_files(directory)
+        elif os.path.isfile(object): files.append(object)
+    return files
