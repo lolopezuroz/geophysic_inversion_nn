@@ -1,11 +1,13 @@
-from requests import get
-from parameters.parameters_resnet import args
+from training_parameters import args
 from print_results.deploy_model import deploy_model
 from functions.usual_functions import plot, get_all_files
 from print_results.graphic_parameters import parameters
 from functions.importation import copy, gdal
 
-deployment_directory = deploy_model(args) # perform prediction on given areas
+shapefile_path = ""
+save_location = ""
+
+deployment_directory = deploy_model(args, shapefile_path, save_location) # perform prediction on given areas
 files = get_all_files(deployment_directory) # get all files created from the function above
 for file in files:
     name, extension = file.split("/")[-1].split(".")
@@ -21,7 +23,7 @@ for file in files:
     for key, value in parameters.items(): # iterate through graphical parameters availables
         if key in data_name: # the image represent 
             copy_param = copy.deepcopy(parameters)
-            
+
             if "predicted" in data_name: 
                 copy_param.title = f"Predicted {copy_param['title'].lower()}"
             if zone_id: 

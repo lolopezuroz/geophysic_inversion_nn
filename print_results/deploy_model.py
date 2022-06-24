@@ -10,10 +10,10 @@ from functions.usual_functions import exist_directory,\
 # hard coded image sources
 # would need a wonderfully designed database to extract/patch-together/sub-sample images based on the geometry intersection and inputs required
 source_images = {
-    "slope": "/home/lopezurl/geophysic_inversion/create_dataset/input_data/slope_swissAlti3d_aligned.tif",
-    "ice_velocity": "/home/lopezurl/geophysic_inversion/create_dataset/input_data/V_RGI-11_2021July01_aligned.tif",
-    "ice_occupation": "/home/lopezurl/geophysic_inversion/create_dataset/input_data/glacier_class_aligned.tif",
-    "ice_thickness": "/home/lopezurl/geophysic_inversion/create_dataset/input_data/IceThickness_aligned.tif"
+    "slope": "./data/sources/slope_swissAlti3d_aligned.tif",
+    "ice_velocity": "./data/sources/V_RGI-11_2021July01_aligned.tif",
+    "ice_occupation": "./data/sources/glacier_class_aligned.tif",
+    "ice_thickness": "./data/sources/IceThickness_aligned.tif"
 }
 
 def deploy_model(args:dict,

@@ -8,7 +8,7 @@ from functions.importation import os,\
                                   make_axes_locatable
 
 
-def extract_paths(items_dictionnary:dict) -> DataFrame:
+def extract_paths(items_dictionnary:list) -> DataFrame:
     """
     check tiles where inputs and groundtruths are available
 
@@ -17,7 +17,8 @@ def extract_paths(items_dictionnary:dict) -> DataFrame:
     return:panda.Dataframe
     """
     data_dict={}
-    for item_name, item_directory in items_dictionnary.items():
+    for item_directory in items_dictionnary:
+        item_name = item_directory.split("/")[-1]
         data_dict[item_name] = {}
         for file in os.listdir(item_directory):
             if file.split('.')[-1] != "tif": continue
