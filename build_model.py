@@ -1,6 +1,6 @@
 from functions.train import train
-from functions.glacier_dataset import load_dataset
-from training_parameters import args
+from training_parameters import args, models_instanciations
 
-train_dataset, test_dataset = load_dataset(args)
-train(args, train_dataset, test_dataset)
+# (TODO: import and write parameters)
+
+train(args, models_instanciations)

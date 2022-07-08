@@ -1,10 +1,14 @@
 import os
 import datetime
-import tensorflow
 import numpy
-import rasterio
+#import rasterio
 import copy
 import math
+import sys
+import json
+
+import tensorflow
+from tensorflow import keras, Tensor
 
 from PIL import Image
 from osgeo import gdal, ogr
